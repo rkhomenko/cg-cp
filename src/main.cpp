@@ -1,4 +1,4 @@
-// Computer graphic lab 6
+// Computer graphic curse project
 // Variant 20
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
@@ -10,7 +10,7 @@
 void Init() {
     Q_INIT_RESOURCE(resources);
 
-    QCoreApplication::setApplicationName("CG Lab06 by Roman Khomenko (8O-308)");
+    QCoreApplication::setApplicationName("CG CP by Roman Khomenko (8O-308)");
     QCoreApplication::setOrganizationName("Khomenko and Co");
     QCoreApplication::setApplicationVersion("0.1.0");
 }

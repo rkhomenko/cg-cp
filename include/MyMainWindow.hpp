@@ -1,4 +1,4 @@
-// Computer graphic lab 6
+// Computer graphic curse project
 // Variant 20
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
@@ -20,7 +20,7 @@ public:
     ~MyMainWindow() = default;
 
     static constexpr auto VARIANT_DESCRIPTION =
-        "Computer grapics lab 6\n"
+        "Computer grapics curse project\n"
         "Variant 20: ellipsoid layer with сolor\n"
         "changing by sinusoidal law\n"
         "Made by Roman Khomenko (8O-308)";

@@ -1,4 +1,4 @@
-// Computer graphic lab 6
+// Computer graphic curse project
 // Variant 20
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
