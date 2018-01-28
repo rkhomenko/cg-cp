@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/shaders">
+        <file alias="fragmentShader.glsl">shaders/fragmentShader.glsl</file>
+        <file alias="vertexShader.glsl">shaders/vertexShader.glsl</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="pauseIcon.svg">icons/pauseIcon.svg</file>
+        <file alias="playIcon.svg">icons/playIcon.svg</file>
+        <file alias="scaleDownIcon.svg">icons/scaleDownIcon.svg</file>
+        <file alias="scaleUpIcon.svg">icons/scaleUpIcon.svg</file>
+        <file alias="skipNextIcon.svg">icons/skipNextIcon.svg</file>
+        <file alias="skipPrevIcon.svg">icons/skipPrevIcon.svg</file>
+    </qresource>
+</RCC>
