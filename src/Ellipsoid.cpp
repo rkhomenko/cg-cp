@@ -1,3 +1,8 @@
+// Computer graphic curse project
+// Variant 20
+// Copyright © 2017-2018 Roman Khomenko (8O-308)
+// All rights reserved
+
 #include <Ellipsoid.hpp>
 
 #include <algorithm>
@@ -188,8 +193,7 @@ LayerVector Ellipsoid::GenerateVertices(const Mat4x4& rotateMatrix) const {
     }
 
     for (auto h : {start, height}) {
-        auto layer =
-            Layer(A, B, C, h, VertexCount, rotateMatrix, ViewPoint);
+        auto layer = Layer(A, B, C, h, VertexCount, rotateMatrix, ViewPoint);
         if (layer.GetItemsCount() != 0) {
             layers.emplace_back(layer);
         }

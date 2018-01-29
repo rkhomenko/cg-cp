@@ -3,8 +3,8 @@
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
 
-#ifndef CG_LAB_VERTEX_HPP_
-#define CG_LAB_VERTEX_HPP_
+#ifndef CG_CP_VERTEX_HPP_
+#define CG_CP_VERTEX_HPP_
 
 #ifdef EIGEN3_INCLUDE_DIR
 #include <Eigen/Dense>
@@ -72,4 +72,4 @@ private:
     FloatType Color[4];
 };
 
-#endif  // CG_LAB_VERTEX_HPP_
+#endif  // CG_CP_VERTEX_HPP_

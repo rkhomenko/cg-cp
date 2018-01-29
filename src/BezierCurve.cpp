@@ -1,11 +1,12 @@
+// Computer graphic curse project
+// Variant 20
+// Copyright © 2017-2018 Roman Khomenko (8O-308)
+// All rights reserved
+
 #include <BezierCurve.hpp>
 
-static float data[] = {
-    -1.0f,  3.0f, -3.0f, 1.0f,
-     3.0f, -6.0f,  3.0f, 0.0f,
-    -3.0f,  3.0f,  0.0f, 0.0f,
-     1.0f,  0.0f,  0.0f, 0.0f
-};
+static float data[] = {-1.0f, 3.0f, -3.0f, 1.0f, 3.0f, -6.0f, 3.0f, 0.0f,
+                       -3.0f, 3.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f};
 
 const Mat4x4 BezierCurve::BasisMatrix = Map4x4(data);
 

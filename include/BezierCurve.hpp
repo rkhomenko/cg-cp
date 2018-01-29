@@ -3,8 +3,8 @@
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
 
-#ifndef CG_LAB_BEZIER_CURVE_HPP_
-#define CG_LAB_BEZIER_CURVE_HPP_
+#ifndef CG_CP_BEZIER_CURVE_HPP_
+#define CG_CP_BEZIER_CURVE_HPP_
 
 #include <Vertex.hpp>
 
@@ -42,4 +42,4 @@ private:
     std::array<Vec4, 4> Points;
 };
 
-#endif // CG_LAB_BEZIER_CURVE_HPP_
+#endif // CG_CP_BEZIER_CURVE_HPP_
