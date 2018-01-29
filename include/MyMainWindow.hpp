@@ -3,8 +3,8 @@
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
 
-#ifndef CG_LAB_MYMAINWINDOW_HPP_
-#define CG_LAB_MYMAINWINDOW_HPP_
+#ifndef CG_CP_MYMAINWINDOW_HPP_
+#define CG_CP_MYMAINWINDOW_HPP_
 
 #include <QMainWindow>
 
@@ -31,4 +31,4 @@ private:
     MyOpenGLWidget* OpenGLWidget;
 };
 
-#endif  // CG_LAB_MYMAINWINDOW_HPP_
+#endif  // CG_CP_MYMAINWINDOW_HPP_

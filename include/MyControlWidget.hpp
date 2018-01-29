@@ -3,8 +3,8 @@
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
 
-#ifndef CG_LAB_MYCONTROLWIDGET_HPP_
-#define CG_LAB_MYCONTROLWIDGET_HPP_
+#ifndef CG_CP_MYCONTROLWIDGET_HPP_
+#define CG_CP_MYCONTROLWIDGET_HPP_
 
 #include <QWidget>
 
@@ -41,4 +41,4 @@ private:
     Ui::MyControlWidget* WidgetUi;
 };
 
-#endif  // CG_LAB_MYCONTROLWIDGET_HPP_
+#endif  // CG_CP_MYCONTROLWIDGET_HPP_
