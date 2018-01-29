@@ -3,7 +3,7 @@
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
 
-#version 330
+#version 330 core
 
 attribute highp vec4 position;
 attribute highp vec4 color;
