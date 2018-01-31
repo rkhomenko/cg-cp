@@ -6,6 +6,7 @@
 #include <MyControlWidget.hpp>
 #include <MyMainWindow.hpp>
 #include <MyOpenGLWidget.hpp>
+#include <MyPointsControlWidget.hpp>
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -28,6 +29,15 @@ MyMainWindow::MyMainWindow(QWidget* parent) : QMainWindow(parent) {
 }
 
 QWidget* MyMainWindow::CreateCentralWidget() {
+    auto tabWidget = new QTabWidget;
+
+    tabWidget->addTab(CreateViewTabWidget(), "View");
+    tabWidget->addTab(CreatePointsTabWidget(), "Points");
+
+    return tabWidget;
+}
+
+QWidget* MyMainWindow::CreateViewTabWidget() {
     const auto fixedSizePolicy =
         QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
@@ -71,6 +81,19 @@ QWidget* MyMainWindow::CreateCentralWidget() {
 
     mainLayout->addLayout(toolLayout);
     mainLayout->addWidget(OpenGLWidget);
+    widget->setLayout(mainLayout);
+
+    return widget;
+}
+
+QWidget* MyMainWindow::CreatePointsTabWidget() {
+    auto widget = new QWidget;
+    auto mainLayout = new QVBoxLayout;
+
+    mainLayout->addWidget(new MyPointsControlWidget("First curve:"));
+    mainLayout->addWidget(new MyPointsControlWidget("Second curve:"));
+    mainLayout->addStretch();
+
     widget->setLayout(mainLayout);
 
     return widget;

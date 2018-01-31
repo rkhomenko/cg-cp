@@ -27,6 +27,8 @@ public:
 
 private:
     QWidget* CreateCentralWidget();
+    QWidget* CreateViewTabWidget();
+    QWidget* CreatePointsTabWidget();
 
     MyOpenGLWidget* OpenGLWidget;
 };
