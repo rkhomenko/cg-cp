@@ -16,7 +16,8 @@ set(HEADER_SUFFIX "hpp")
 set(SOURCE_SUFFIX "cpp")
 set(INCLUDE_DIR "include")
 set(SOURCE_DIR "src")
-set(UI_FILE "ui/MyControlWidget.ui")
+set(MY_CONTROL_WIDGET_UI "ui/MyControlWidget.ui")
+set(MY_POINTS_CONTROL_WIDGET_UI "ui/MyPointsControlWidget.ui")
 set(RESOURCES_FILE "resources/resources.qrc")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -33,9 +34,8 @@ include_directories(${INCLUDE_DIR})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
 qt5_add_resources(RESOURCES ${RESOURCES_FILE})
-qt5_wrap_ui(UI_INCLUDES ${UI_FILE})
-
-find_package(OpenGL REQUIRED)
+qt5_wrap_ui(MY_CONTROL_WIDGET_INCLUDE ${MY_CONTROL_WIDGET_UI})
+qt5_wrap_ui(MY_POINTS_CONTROL_WIDGET_INCLUDE ${MY_POINTS_CONTROL_WIDGET_UI})
 
 if(EIGEN3_INCLUDE_DIR)
     add_definitions(-DEIGEN3_INCLUDE_DIR)
@@ -46,10 +46,11 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads)
 
-add_executable(${PROJECT_NAME} ${INCLUDES} ${UI_INCLUDES}
+add_executable(${PROJECT_NAME} ${INCLUDES}
+                               ${MY_CONTROL_WIDGET_INCLUDE}
+                               ${MY_POINTS_CONTROL_WIDGET_INCLUDE}
                                ${SOURCES}
                                ${RESOURCES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets
-                                      Threads::Threads
-                                      ${OPENGL_LIBRARIES})
+                                      Threads::Threads)
