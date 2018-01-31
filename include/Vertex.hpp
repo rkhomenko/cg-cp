@@ -32,6 +32,7 @@ public:
 
     Vertex(Vertex&& v) = default;
     Vertex(const Vertex& v) = default;
+    constexpr Vertex& operator=(const Vertex& v) = default;
 
     void SetColor(const Vec4& color) noexcept { ToArray(color, Color); }
 
