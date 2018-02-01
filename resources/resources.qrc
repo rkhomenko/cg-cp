@@ -7,5 +7,6 @@
         <file alias="scaleDownIcon.svg">icons/scaleDownIcon.svg</file>
         <file alias="scaleUpIcon.svg">icons/scaleUpIcon.svg</file>
         <file alias="saveIcon.svg">icons/saveIcon.svg</file>
+        <file alias="openIcon.svg">icons/openIcon.svg</file>
     </qresource>
 </RCC>
