@@ -6,9 +6,12 @@
 #ifndef CG_CP_MYMAINWINDOW_HPP_
 #define CG_CP_MYMAINWINDOW_HPP_
 
-#include <QMainWindow>
+#include <MyPointsControlWidget.hpp>
 
 #include <array>
+
+#include <QMainWindow>
+#include <QString>
 
 class MyOpenGLWidget;
 
@@ -17,6 +20,9 @@ class MyMainWindow : public QMainWindow {
 
 public:
     explicit MyMainWindow(QWidget* parent = nullptr);
+    explicit MyMainWindow(const QString& inputFileName,
+                          const QString& outputFileName,
+                          QWidget* parent = nullptr);
     ~MyMainWindow() = default;
 
     static constexpr auto VARIANT_DESCRIPTION =
@@ -31,6 +37,10 @@ private:
     QWidget* CreatePointsTabWidget();
 
     MyOpenGLWidget* OpenGLWidget;
+    QString InputFileName;
+    QString OutputFileName;
+    MyPointsControlWidget* FirstCurvePoints;
+    MyPointsControlWidget* SecondCurvePoints;
 };
 
 #endif  // CG_CP_MYMAINWINDOW_HPP_

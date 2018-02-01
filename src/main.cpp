@@ -39,29 +39,18 @@ int main(int argc, char* argv[]) {
 
     parser.process(a);
 
-    PointsDocument pointsDocument;
+    QString inputFileName = "";
+    QString outputFileName = "";
 
     if (parser.isSet(inputFileOption)) {
-        auto inputFileName = parser.value(inputFileOption);
-        auto inputFile = QFile(inputFileName);
-        if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qWarning() << "Input file not set: cannot openfile" << inputFileName
-                       << "!";
-        }
-        pointsDocument.Load(inputFile);
+        inputFileName = parser.value(inputFileOption);
     }
 
     if (parser.isSet(outputFileOption)) {
-        auto outputFileName = parser.value(outputFileOption);
-        auto outputFile = QFile(outputFileName);
-        if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qWarning() << "Output file not set: cannot openfile"
-                       << outputFileName << "!";
-        }
-        pointsDocument.Save(outputFile);
+        outputFileName = parser.value(outputFileOption);
     }
 
-    MyMainWindow w;
+    MyMainWindow w(inputFileName, outputFileName);
     w.show();
 
     return a.exec();

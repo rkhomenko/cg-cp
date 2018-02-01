@@ -23,7 +23,8 @@ public:
     using PointArray = std::array<Vertex, 4>;
 
     explicit MyPointsControlWidget(QWidget* parent = nullptr);
-    explicit MyPointsControlWidget(const char* curveName, QWidget* parent = nullptr);
+    explicit MyPointsControlWidget(const char* curveName,
+                                   QWidget* parent = nullptr);
     ~MyPointsControlWidget();
 
     void SetPoints(const PointArray& points);
@@ -33,7 +34,6 @@ public slots:
     void ApplyPoints();
 
 private:
-
     PointArray Points;
     Ui::MyPointsControlWidget* WidgetUi;
 };

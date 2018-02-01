@@ -6,18 +6,27 @@
 #include <MyControlWidget.hpp>
 #include <MyMainWindow.hpp>
 #include <MyOpenGLWidget.hpp>
-#include <MyPointsControlWidget.hpp>
+#include <PointsDocument.hpp>
 
+#include <QFileDialog>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPixmap>
 #include <QPushButton>
 #include <QSurfaceFormat>
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-MyMainWindow::MyMainWindow(QWidget* parent) : QMainWindow(parent) {
+MyMainWindow::MyMainWindow(QWidget* parent) : MyMainWindow("", "", parent) {}
+
+MyMainWindow::MyMainWindow(const QString& inputFileName,
+                           const QString& outputFileName,
+                           QWidget* parent)
+    : QMainWindow(parent),
+      InputFileName{inputFileName},
+      OutputFileName{outputFileName} {
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
@@ -98,6 +107,9 @@ QWidget* MyMainWindow::CreatePointsTabWidget() {
     auto openButton = new QPushButton;
     auto saveButton = new QPushButton;
 
+    FirstCurvePoints = new MyPointsControlWidget("First curve:");
+    SecondCurvePoints = new MyPointsControlWidget("Second curve:");
+
     auto initButton = [&sizePolicy](auto&& button, auto&& iconPath) {
         QPixmap pixmap(iconPath);
         QIcon icon(pixmap);
@@ -110,14 +122,65 @@ QWidget* MyMainWindow::CreatePointsTabWidget() {
     initButton(openButton, ":/icons/openIcon.svg");
     initButton(saveButton, ":/icons/saveIcon.svg");
 
+    connect(openButton, &QPushButton::clicked, this, [this]() {
+        QString inputFileName;
+        if (InputFileName != "") {
+            inputFileName = InputFileName;
+        } else {
+            inputFileName = QFileDialog::getOpenFileName(
+                this, "Load points", "", "JSON files (*.json);;All files (*)");
+        }
+        auto inputFile = QFile(inputFileName);
+        if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QMessageBox::warning(this, "Error", "Cannot open file!",
+                                 QMessageBox::Ok, QMessageBox::NoButton);
+            return;
+        }
+
+        try {
+            PointsDocument pointsDocument(inputFile);
+            FirstCurvePoints->SetPoints(
+                pointsDocument.GetPoints(CurveType::FIRST));
+            SecondCurvePoints->SetPoints(
+                pointsDocument.GetPoints(CurveType::SECOND));
+        } catch (std::runtime_error& e) {
+            QMessageBox::warning(this, "Error", "Cannot parse file!",
+                                 QMessageBox::Ok, QMessageBox::NoButton);
+        }
+    });
+
+    connect(saveButton, &QPushButton::clicked, this, [this]() {
+        QString outputFileName;
+        if (OutputFileName != "") {
+            outputFileName = OutputFileName;
+        } else {
+            outputFileName = QFileDialog::getSaveFileName(
+                this, "Save points", "", "JSON files (*.json);;All files (*)");
+        }
+        auto outputFile = QFile(outputFileName);
+        if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QMessageBox::warning(this, "Error", "Cannot open file!",
+                                 QMessageBox::Ok, QMessageBox::NoButton);
+            return;
+        }
+
+        PointsDocument pointsDocument;
+        pointsDocument.SetPoints(CurveType::FIRST,
+                                 FirstCurvePoints->GetPoints());
+        pointsDocument.SetPoints(CurveType::SECOND,
+                                 SecondCurvePoints->GetPoints());
+        pointsDocument.Save(outputFile);
+        outputFile.close();
+    });
+
     auto fileLayout = new QHBoxLayout;
     fileLayout->addWidget(openButton);
     fileLayout->addWidget(saveButton);
     fileLayout->addStretch();
 
     mainLayout->addLayout(fileLayout);
-    mainLayout->addWidget(new MyPointsControlWidget("First curve:"));
-    mainLayout->addWidget(new MyPointsControlWidget("Second curve:"));
+    mainLayout->addWidget(FirstCurvePoints);
+    mainLayout->addWidget(SecondCurvePoints);
     mainLayout->addStretch();
 
     widget->setLayout(mainLayout);
