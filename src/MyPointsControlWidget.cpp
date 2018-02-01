@@ -44,6 +44,9 @@ MyPointsControlWidget::MyPointsControlWidget(const char* curveName,
     ADD_VALIDATOR_POINTS(validator);
 }
 
+#undef ADD_VALIDATOR_POINTS
+#undef ADD_VALIDATOR_POINT
+
 MyPointsControlWidget::~MyPointsControlWidget() {
     delete WidgetUi;
 }
