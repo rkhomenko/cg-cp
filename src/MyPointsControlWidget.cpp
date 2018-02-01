@@ -18,10 +18,30 @@ MyPointsControlWidget::MyPointsControlWidget(QWidget* parent)
     WidgetUi->setupUi(this);
 }
 
+#define ADD_VALIDATOR_POINT(index, validator)                       \
+    do {                                                            \
+        WidgetUi->point##index##XLineEdit->setValidator(validator); \
+        WidgetUi->point##index##YLineEdit->setValidator(validator); \
+        WidgetUi->point##index##ZLineEdit->setValidator(validator); \
+    } while (0)
+#define ADD_VALIDATOR_POINTS(validator)    \
+    do {                                   \
+        ADD_VALIDATOR_POINT(0, validator); \
+        ADD_VALIDATOR_POINT(1, validator); \
+        ADD_VALIDATOR_POINT(2, validator); \
+        ADD_VALIDATOR_POINT(3, validator); \
+    } while (0)
+
 MyPointsControlWidget::MyPointsControlWidget(const char* curveName,
                                              QWidget* parent)
     : MyPointsControlWidget(parent) {
     WidgetUi->curveNameLabel->setText(curveName);
+
+    constexpr auto regexStr = "0\\.\\d{1,4}";
+    const auto regexp = QRegExp(regexStr);
+    auto validator = new QRegExpValidator(regexp);
+
+    ADD_VALIDATOR_POINTS(validator);
 }
 
 MyPointsControlWidget::~MyPointsControlWidget() {
