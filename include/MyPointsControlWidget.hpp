@@ -27,7 +27,7 @@ public:
     ~MyPointsControlWidget();
 
     void SetPoints(const PointArray& points);
-    const PointArray& GetPoints() const;
+    const PointArray& GetPoints();
 
 public slots:
     void ApplyPoints();

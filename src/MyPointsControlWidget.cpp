@@ -51,8 +51,9 @@ MyPointsControlWidget::~MyPointsControlWidget() {
     delete WidgetUi;
 }
 
-#define SET_POINT_COORD(index, COORD, value) \
-    WidgetUi->point##index##COORD##LineEdit->setText(QString::number(value))
+#define SET_POINT_COORD(index, COORD, value)          \
+    WidgetUi->point##index##COORD##LineEdit->setText( \
+        QString().setNum(value, 'g', 4))
 #define SET_POINT(index)                         \
     do {                                         \
         auto vec4 = Points[index].GetPosition(); \
@@ -75,7 +76,8 @@ void MyPointsControlWidget::SetPoints(const PointArray& points) {
 #undef SET_POINT
 #undef SET_POINT_COORD
 
-const PointArray& MyPointsControlWidget::GetPoints() const {
+const PointArray& MyPointsControlWidget::GetPoints() {
+    ApplyPoints();
     return Points;
 }
 
