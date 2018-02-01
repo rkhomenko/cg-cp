@@ -9,7 +9,10 @@
 #include <MyPointsControlWidget.hpp>
 
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QLabel>
+#include <QPixmap>
+#include <QPushButton>
 #include <QSurfaceFormat>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -87,9 +90,32 @@ QWidget* MyMainWindow::CreateViewTabWidget() {
 }
 
 QWidget* MyMainWindow::CreatePointsTabWidget() {
+    const auto sizePolicy = QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     auto widget = new QWidget;
     auto mainLayout = new QVBoxLayout;
 
+    auto openButton = new QPushButton;
+    auto saveButton = new QPushButton;
+
+    auto initButton = [&sizePolicy](auto&& button, auto&& iconPath) {
+        QPixmap pixmap(iconPath);
+        QIcon icon(pixmap);
+
+        button->setSizePolicy(sizePolicy);
+        button->setIcon(icon);
+        button->setIconSize(pixmap.rect().size());
+    };
+
+    initButton(openButton, ":/icons/openIcon.svg");
+    initButton(saveButton, ":/icons/saveIcon.svg");
+
+    auto fileLayout = new QHBoxLayout;
+    fileLayout->addWidget(openButton);
+    fileLayout->addWidget(saveButton);
+    fileLayout->addStretch();
+
+    mainLayout->addLayout(fileLayout);
     mainLayout->addWidget(new MyPointsControlWidget("First curve:"));
     mainLayout->addWidget(new MyPointsControlWidget("Second curve:"));
     mainLayout->addStretch();
