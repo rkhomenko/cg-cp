@@ -27,8 +27,8 @@ public:
 
     static constexpr auto VARIANT_DESCRIPTION =
         "Computer grapics curse project\n"
-        "Variant 20: ellipsoid layer with сolor\n"
-        "changing by sinusoidal law\n"
+        "Variant 20: ruled surface\n"
+        "\t(guides - Bezier curves)\n"
         "Made by Roman Khomenko (8O-308)";
 
 private:
