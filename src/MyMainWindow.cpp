@@ -8,6 +8,7 @@
 #include <MyOpenGLWidget.hpp>
 #include <PointsDocument.hpp>
 
+#include <QDebug>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QIcon>
@@ -45,6 +46,15 @@ QWidget* MyMainWindow::CreateCentralWidget() {
 
     tabWidget->addTab(CreateViewTabWidget(), "View");
     tabWidget->addTab(CreatePointsTabWidget(), "Points");
+
+    connect(tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
+        if (index != 0) {
+            return;
+        }
+
+        OpenGLWidget->PointsChanged(FirstCurvePoints->GetPoints(),
+                                    SecondCurvePoints->GetPoints());
+    });
 
     return tabWidget;
 }

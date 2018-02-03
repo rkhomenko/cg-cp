@@ -7,6 +7,7 @@
 #define CG_CP_MYOPENGLWIDGET_HPP_
 
 #include <BezierCurve.hpp>
+#include <PointsDocument.hpp>
 
 #include <array>
 
@@ -17,8 +18,6 @@ class QOpenGLBuffer;
 class QOpenGLVertexArrayObject;
 class QOpenGLShaderProgram;
 
-class QTimer;
-
 class MyOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
 
@@ -27,6 +26,8 @@ public:
 
     explicit MyOpenGLWidget(QWidget* parent = nullptr);
     ~MyOpenGLWidget();
+
+    void PointsChanged(const PointArray& curve1, const PointArray& curve2);
 
 public slots:
     void ScaleUpSlot();
@@ -84,6 +85,8 @@ private:
     SizeType LinesCount;
     FloatType Teta;
     FloatType Phi;
+    PointArray FirstCurve;
+    PointArray SecondCurve;
 };
 
 #endif  // CG_CP_MYOPENGLWIDGET_HPP_

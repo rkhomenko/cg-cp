@@ -3,7 +3,7 @@
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
 
-#ifndef CG_CP_POINTS_DOCUMNET_HPP_
+#ifndef CG_CP_POINTS_DOCUMENT_HPP_
 #define CG_CP_POINTS_DOCUMENT_HPP_
 
 #include <Vertex.hpp>
