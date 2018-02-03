@@ -25,8 +25,7 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget* parent)
       AngleOX{0.0},
       AngleOY{0.0},
       AngleOZ{0.0},
-      VertexCount{0},
-      SurfaceCount{0},
+      LinesCount{0},
       Teta{0},
       Phi{0} {
     auto sizePolicy =
@@ -67,14 +66,8 @@ void MyOpenGLWidget::OZAngleChangedSlot(FloatType angle) {
     OnWidgetUpdate();
 }
 
-void MyOpenGLWidget::VertexCountChangedSlot(int count) {
-    VertexCount = static_cast<SizeType>(count);
-    UpdateOnChange(width(), height());
-    OnWidgetUpdate();
-}
-
-void MyOpenGLWidget::SurfaceCountChangedSlot(int count) {
-    SurfaceCount = static_cast<SizeType>(count);
+void MyOpenGLWidget::LineCountChangedSlot(int count) {
+    LinesCount = static_cast<SizeType>(count);
     UpdateOnChange(width(), height());
     OnWidgetUpdate();
 }
@@ -180,9 +173,6 @@ void MyOpenGLWidget::OnWidgetUpdate() {
 }
 
 Mat4x4 MyOpenGLWidget::GenerateScaleMatrix(int width, int height) const {
-    const auto DEFAULT_WIDTH = IMAGE_DEFAULT_SIZE.width();
-    const auto DEFAULT_HEIGHT = IMAGE_DEFAULT_SIZE.height();
-
     auto xScaleFactor = 1.0f / (0.5f * width);
     auto yScaleFactor = 1.0f / (0.5f * height);
 

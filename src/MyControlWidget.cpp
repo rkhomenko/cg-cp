@@ -57,10 +57,8 @@ MyControlWidget::MyControlWidget(QWidget* parent)
     };
 
     // surface drawing params connection
-    connectSlider(WidgetUi->vetexSlider,
-                  &MyControlWidget::VertexCountChangedSignal);
-    connectSlider(WidgetUi->surfaceSlider,
-                  &MyControlWidget::SurfaceCountChangedSignal);
+    connectSlider(WidgetUi->linesSlider,
+                  &MyControlWidget::LineCountChangedSignal);
 }
 
 MyControlWidget::~MyControlWidget() {

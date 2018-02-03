@@ -36,8 +36,7 @@ public slots:
     void OYAngleChangedSlot(FloatType angle);
     void OZAngleChangedSlot(FloatType angle);
 
-    void VertexCountChangedSlot(int count);
-    void SurfaceCountChangedSlot(int count);
+    void LineCountChangedSlot(int count);
 
 protected:
     void initializeGL() override;
@@ -82,8 +81,7 @@ private:
     FloatType AngleOX;
     FloatType AngleOY;
     FloatType AngleOZ;
-    SizeType VertexCount;
-    SizeType SurfaceCount;
+    SizeType LinesCount;
     FloatType Teta;
     FloatType Phi;
 };
