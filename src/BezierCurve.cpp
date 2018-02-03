@@ -10,6 +10,12 @@ static float data[] = {-1.0f, 3.0f, -3.0f, 1.0f, 3.0f, -6.0f, 3.0f, 0.0f,
 
 const Mat4x4 BezierCurve::BasisMatrix = Map4x4(data);
 
+BezierCurve::BezierCurve(const std::array<Vertex, 4> &points) {
+    for (auto i = 0UL; i < points.size(); i++) {
+        Points[i] = points[i].GetPosition();
+    }
+}
+
 Vec4 BezierCurve::operator()(float t) const {
     const Vec4 coeffs = GenPolynomVec(t) * BasisMatrix;
     auto result = Vec4(0, 0, 0, 0);

@@ -98,32 +98,13 @@ void MyOpenGLWidget::initializeGL() {
     }
 
     Buffer = new QOpenGLBuffer;
-    Buffer->create();
-    Buffer->bind();
-    Buffer->setUsagePattern(QOpenGLBuffer::DynamicDraw);
-
-    Vertex triangle[] = {Vertex{-175.f, -175.0f},
-                         Vertex{0.0f, 350.0f * std::sqrt(3) / 2 - 175.0f},
-                         Vertex{175.0f, -175.0f}};
-
-    Buffer->allocate(triangle, 3 * sizeof(Vertex));
-
     VertexArray = new QOpenGLVertexArrayObject;
-    VertexArray->create();
-    VertexArray->bind();
-
-    int posAttr = ShaderProgram->attributeLocation(POSITION);
-    ShaderProgram->enableAttributeArray(posAttr);
-    ShaderProgram->setAttributeBuffer(
-        posAttr, GL_FLOAT, Vertex::GetPositionOffset(),
-        Vertex::GetPositionTupleSize(), Vertex::GetStride());
-
-    ShaderProgram->disableAttributeArray(posAttr);
 
     UpdateOnChange(width(), height());
 
     VertexArray->release();
     Buffer->release();
+    ShaderProgram->release();
 }
 
 void MyOpenGLWidget::resizeGL(int width, int height) {
@@ -138,15 +119,53 @@ void MyOpenGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    if (!Buffer->bind()) {
-        qDebug() << "Cannot bind buffer";
+    std::vector<Vertex> curvesVertices;
+    BezierCurve firstCurve(FirstCurve);
+    float deltaT = 0.05;
+
+    for (float t = 0.0f; t < 1.0f; t += deltaT) {
+        curvesVertices.push_back(firstCurve(t));
     }
 
-    VertexArray->bind();
-    int posAttr = ShaderProgram->attributeLocation(POSITION);
-    ShaderProgram->enableAttributeArray(posAttr);
+    curvesVertices.push_back(firstCurve(1.0f));
+    auto firstCurveSize = curvesVertices.size();
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    BezierCurve secondCurve(SecondCurve);
+    for (float t = 0.0f; t < 1.0f; t += deltaT) {
+        curvesVertices.push_back(secondCurve(t));
+    }
+
+    curvesVertices.push_back(secondCurve(1.0f));
+
+    Buffer->destroy();
+    if (!Buffer->create()) {
+        qDebug() << "Cannot create buffer!";
+    }
+    if (!Buffer->bind()) {
+        qDebug() << "Cannot bind buffer!";
+    }
+    Buffer->setUsagePattern(QOpenGLBuffer::DynamicDraw);
+    Buffer->allocate(curvesVertices.data(),
+                     sizeof(Vertex) * curvesVertices.size());
+
+    VertexArray->destroy();
+    VertexArray->create();
+    VertexArray->bind();
+
+    int posAttr = ShaderProgram->attributeLocation(POSITION);
+    int colorAttr = ShaderProgram->attributeLocation(COLOR);
+    ShaderProgram->enableAttributeArray(posAttr);
+    ShaderProgram->setAttributeBuffer(
+        posAttr, GL_FLOAT, Vertex::GetPositionOffset(),
+        Vertex::GetPositionTupleSize(), Vertex::GetStride());
+    ShaderProgram->enableAttributeArray(colorAttr);
+    ShaderProgram->setAttributeBuffer(
+        colorAttr, GL_FLOAT, Vertex::GetColorOffset(),
+        Vertex::GetColorTupleSize(), Vertex::GetStride());
+
+    glDrawArrays(GL_LINE_STRIP, 0, firstCurveSize);
+    glDrawArrays(GL_LINE_STRIP, firstCurveSize,
+                 curvesVertices.size() - firstCurveSize);
 
     Buffer->release();
     VertexArray->release();

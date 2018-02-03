@@ -37,7 +37,7 @@ MyPointsControlWidget::MyPointsControlWidget(const char* curveName,
     : MyPointsControlWidget(parent) {
     WidgetUi->curveNameLabel->setText(curveName);
 
-    constexpr auto regexStr = "0\\.\\d{1,4}";
+    constexpr auto regexStr = "(\\+|\\-){0,1}\\d{1,3}";
     const auto regexp = QRegExp(regexStr);
     auto validator = new QRegExpValidator(regexp);
 

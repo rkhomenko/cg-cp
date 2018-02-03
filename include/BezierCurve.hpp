@@ -29,8 +29,7 @@ using VertexVector = std::vector<Vertex>;
 
 class BezierCurve {
 public:
-    template <class... Args>
-    BezierCurve(Args... args) : Points{args...} {}
+    BezierCurve(const std::array<Vertex, 4>& points);
 
     Vec4 operator()(float t) const;
 
