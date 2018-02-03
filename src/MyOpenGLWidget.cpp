@@ -76,8 +76,6 @@ void MyOpenGLWidget::PointsChanged(const PointArray& curve1,
                                    const PointArray& curve2) {
     FirstCurve = curve1;
     SecondCurve = curve2;
-    UpdateOnChange(width(), height());
-    OnWidgetUpdate();
 }
 
 void MyOpenGLWidget::initializeGL() {

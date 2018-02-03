@@ -44,17 +44,20 @@ MyMainWindow::MyMainWindow(const QString& inputFileName,
 QWidget* MyMainWindow::CreateCentralWidget() {
     auto tabWidget = new QTabWidget;
 
-    tabWidget->addTab(CreateViewTabWidget(), "View");
     tabWidget->addTab(CreatePointsTabWidget(), "Points");
+    tabWidget->addTab(CreateViewTabWidget(), "View");
 
     connect(tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
-        if (index != 0) {
+        if (index == 0) {
             return;
         }
 
         OpenGLWidget->PointsChanged(FirstCurvePoints->GetPoints(),
                                     SecondCurvePoints->GetPoints());
     });
+
+    OpenGLWidget->PointsChanged(FirstCurvePoints->GetPoints(),
+                                SecondCurvePoints->GetPoints());
 
     return tabWidget;
 }
