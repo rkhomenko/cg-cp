@@ -49,32 +49,6 @@ MyControlWidget::MyControlWidget(QWidget* parent)
                 emit OZAngleChangedSignal(result);
             });
 
-    constexpr auto regexStr = "0\\.\\d{1,4}";
-    const auto regexp = QRegExp(regexStr);
-    auto validator = new QRegExpValidator(regexp);
-
-    for (auto&& lineEdit :
-         {WidgetUi->ambientLineEdit, WidgetUi->specularLineEdit,
-          WidgetUi->diffuseLineEdit}) {
-        lineEdit->setValidator(validator);
-    }
-
-    auto connectLineEdit = [this](auto&& lineEdit, auto&& signal) {
-        connect(lineEdit, &QLineEdit::editingFinished, this,
-                [lineEdit, signal, this]() {
-                    auto coeff = lineEdit->text().toFloat();
-                    emit std::invoke(signal, this, coeff);
-                });
-    };
-
-    // light params line edit connection
-    connectLineEdit(WidgetUi->ambientLineEdit,
-                    &MyControlWidget::AmbientChangedSignal);
-    connectLineEdit(WidgetUi->specularLineEdit,
-                    &MyControlWidget::SpecularChangedSignal);
-    connectLineEdit(WidgetUi->diffuseLineEdit,
-                    &MyControlWidget::DiffuseChangedSignal);
-
     auto connectSlider = [this](auto&& slider, auto&& signal) {
         connect(slider, &QSlider::valueChanged, this,
                 [signal, this](int value) {
@@ -82,7 +56,7 @@ MyControlWidget::MyControlWidget(QWidget* parent)
                 });
     };
 
-    // ellipsoid surface and vertex count params connection
+    // surface drawing params connection
     connectSlider(WidgetUi->vetexSlider,
                   &MyControlWidget::VertexCountChangedSignal);
     connectSlider(WidgetUi->surfaceSlider,

@@ -6,15 +6,9 @@
 #version 330 core
 
 attribute highp vec4 position;
-attribute highp vec4 color;
 
 uniform highp mat4x4 transformMatrix;
 
-varying highp vec4 normal;
-varying highp vec4 point;
-
 void main() {
-    point = position;
-    normal = color;
     gl_Position = position * transformMatrix;
 }

@@ -34,7 +34,7 @@ MyMainWindow::MyMainWindow(const QString& inputFileName,
     format.setVersion(3, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
 
-    OpenGLWidget = new MyOpenGLWidget(1.1f, 1.5f, 0.2f, 20, 60);
+    OpenGLWidget = new MyOpenGLWidget;
     OpenGLWidget->setFormat(format);
 
     setCentralWidget(CreateCentralWidget());
@@ -76,14 +76,6 @@ QWidget* MyMainWindow::CreateViewTabWidget() {
             &MyOpenGLWidget::OYAngleChangedSlot);
     connect(controlWidget, &MyControlWidget::OZAngleChangedSignal, OpenGLWidget,
             &MyOpenGLWidget::OZAngleChangedSlot);
-
-    // set connection for redraw on lighting params changed
-    connect(controlWidget, &MyControlWidget::AmbientChangedSignal, OpenGLWidget,
-            &MyOpenGLWidget::AmbientChangedSlot);
-    connect(controlWidget, &MyControlWidget::SpecularChangedSignal,
-            OpenGLWidget, &MyOpenGLWidget::SpecularChangedSlot);
-    connect(controlWidget, &MyControlWidget::DiffuseChangedSignal, OpenGLWidget,
-            &MyOpenGLWidget::DiffuseChangedSlot);
 
     // set connection for redraw on vertex or surface count changed
     connect(controlWidget, &MyControlWidget::VertexCountChangedSignal,

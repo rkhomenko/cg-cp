@@ -3,7 +3,7 @@
 // Copyright © 2017-2018 Roman Khomenko (8O-308)
 // All rights reserved
 
-#include <Ellipsoid.hpp>
+#include <BezierCurve.hpp>
 #include <MyMainWindow.hpp>
 #include <MyOpenGLWidget.hpp>
 
@@ -16,48 +16,26 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QResizeEvent>
-#include <QTimer>
 
-const Vec3 MyOpenGLWidget::VIEW_POINT = Vec3(0, 0, 1);
 const float MyOpenGLWidget::PI = 4.0f * std::atan(1.0f);
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget* parent)
-    : MyOpenGLWidget(0.5, 0.5, 0.5, 4, 5, parent) {}
-
-MyOpenGLWidget::MyOpenGLWidget(LenghtType a,
-                               LenghtType b,
-                               LenghtType c,
-                               SizeType vertexCount,
-                               SizeType surfaceCount,
-                               QWidget* parent)
     : QOpenGLWidget(parent),
-      EllipsoidLayer{a, b, c, vertexCount, surfaceCount, VIEW_POINT},
       ScaleFactor{3.0f},
       AngleOX{0.0},
       AngleOY{0.0},
       AngleOZ{0.0},
-      AmbientCoeff{0.2},
-      SpecularCoeff{0.2},
-      DiffuseCoeff{0.3},
-      A{a},
-      B{b},
-      C{c},
-      VertexCount{vertexCount},
-      SurfaceCount{surfaceCount},
+      VertexCount{0},
+      SurfaceCount{0},
       Teta{0},
       Phi{0} {
     auto sizePolicy =
         QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setSizePolicy(sizePolicy);
     setMinimumSize(WIDGET_DEFAULT_SIZE);
-
-    Timer = new QTimer;
-    connect(Timer, &QTimer::timeout, this, &MyOpenGLWidget::OnTimeoutSlot);
 }
 
-MyOpenGLWidget::~MyOpenGLWidget() {
-    delete Timer;
-}
+MyOpenGLWidget::~MyOpenGLWidget() {}
 
 void MyOpenGLWidget::ScaleUpSlot() {
     ScaleFactor *= SCALE_FACTOR_PER_ONCE;
@@ -85,24 +63,6 @@ void MyOpenGLWidget::OYAngleChangedSlot(FloatType angle) {
 
 void MyOpenGLWidget::OZAngleChangedSlot(FloatType angle) {
     AngleOZ = angle;
-    UpdateOnChange(width(), height());
-    OnWidgetUpdate();
-}
-
-void MyOpenGLWidget::AmbientChangedSlot(float ambientCoeff) {
-    AmbientCoeff = ambientCoeff;
-    UpdateOnChange(width(), height());
-    OnWidgetUpdate();
-}
-
-void MyOpenGLWidget::SpecularChangedSlot(float specularCoeff) {
-    SpecularCoeff = specularCoeff;
-    UpdateOnChange(width(), height());
-    OnWidgetUpdate();
-}
-
-void MyOpenGLWidget::DiffuseChangedSlot(float diffuseCoeff) {
-    DiffuseCoeff = diffuseCoeff;
     UpdateOnChange(width(), height());
     OnWidgetUpdate();
 }
@@ -142,41 +102,13 @@ void MyOpenGLWidget::initializeGL() {
     Buffer->create();
     Buffer->bind();
     Buffer->setUsagePattern(QOpenGLBuffer::DynamicDraw);
-    UpdateOnChange(width(), height());
-    Buffer->allocate(GetVertexCount(Layers) * sizeof(Vertex));
-
-    {
-        int offset = 0;
-        for (auto&& layer : Layers) {
-            auto& vertices = layer.GetVertices();
-            auto bytes = vertices.size() * sizeof(Vertex);
-            Buffer->write(offset, vertices.data(), bytes);
-            offset += bytes;
-        }
-    }
 
     VertexArray = new QOpenGLVertexArrayObject;
     VertexArray->create();
     VertexArray->bind();
 
-    int posAttr = ShaderProgram->attributeLocation(POSITION);
-    int colorAttr = ShaderProgram->attributeLocation(COLOR);
-    ShaderProgram->enableAttributeArray(posAttr);
-    ShaderProgram->setAttributeBuffer(
-        posAttr, GL_FLOAT, Vertex::GetPositionOffset(),
-        Vertex::GetPositionTupleSize(), Vertex::GetStride());
-    ShaderProgram->enableAttributeArray(colorAttr);
-    ShaderProgram->setAttributeBuffer(
-        colorAttr, GL_FLOAT, Vertex::GetColorOffset(),
-        Vertex::GetColorTupleSize(), Vertex::GetStride());
-
-    ShaderProgram->disableAttributeArray(posAttr);
-    ShaderProgram->disableAttributeArray(colorAttr);
-
     VertexArray->release();
     Buffer->release();
-
-    Timer->start(1000);
 }
 
 void MyOpenGLWidget::resizeGL(int width, int height) {
@@ -199,42 +131,6 @@ void MyOpenGLWidget::paintGL() {
     if (!Buffer->bind()) {
         qDebug() << "Cannot bind buffer";
     }
-    Buffer->setUsagePattern(QOpenGLBuffer::DynamicDraw);
-    Buffer->allocate(GetVertexCount(Layers) * sizeof(Vertex));
-    {
-        int offset = 0;
-        for (auto&& layer : Layers) {
-            auto& vertices = layer.GetVertices();
-            auto bytes = vertices.size() * sizeof(Vertex);
-            Buffer->write(offset, vertices.data(), bytes);
-            offset += bytes;
-        }
-    }
-
-    VertexArray->destroy();
-    VertexArray->create();
-    VertexArray->bind();
-    int posAttr = ShaderProgram->attributeLocation(POSITION);
-    int colorAttr = ShaderProgram->attributeLocation(COLOR);
-    ShaderProgram->enableAttributeArray(posAttr);
-    ShaderProgram->setAttributeBuffer(
-        posAttr, GL_FLOAT, Vertex::GetPositionOffset(),
-        Vertex::GetPositionTupleSize(), Vertex::GetStride());
-    ShaderProgram->enableAttributeArray(colorAttr);
-    ShaderProgram->setAttributeBuffer(
-        colorAttr, GL_FLOAT, Vertex::GetColorOffset(),
-        Vertex::GetColorTupleSize(), Vertex::GetStride());
-    {
-        int offset = 0;
-        for (auto&& layer : Layers) {
-            int count = layer.GetItemsCount();
-            glDrawArrays(GL_TRIANGLES, offset, count);
-            offset += count;
-        }
-    }
-
-    ShaderProgram->disableAttributeArray(posAttr);
-    ShaderProgram->disableAttributeArray(colorAttr);
 
     Buffer->release();
     VertexArray->release();
@@ -249,41 +145,6 @@ void MyOpenGLWidget::CleanUp() {
     delete ShaderProgram;
 }
 
-void MyOpenGLWidget::OnTimeoutSlot() {
-    const auto PI = 4.0f * std::atan(1.0f);
-    const auto delta = PI / 100;
-
-    if (Red < PI / 2) {
-        Red += delta;
-    } else if (Green < PI / 2) {
-        Green += delta;
-    } else if (Blue < PI / 2) {
-        Blue += delta;
-    } else {
-        Red = Green = Blue = 0;
-    }
-
-    auto col = QVector4D(std::sin(Red), std::sin(Green), std::sin(Blue), 1);
-
-    ShaderProgram->bind();
-    ShaderProgram->setUniformValue(DIFFUSE_COLOR, col);
-    ShaderProgram->release();
-
-    UpdateOnChange(width(), height());
-    OnWidgetUpdate();
-    repaint();
-
-    Timer->start(100);
-}
-
-SizeType MyOpenGLWidget::GetVertexCount(const LayerVector& layers) {
-    SizeType result = 0;
-    for (auto&& layer : layers) {
-        result += layer.GetVertices().size();
-    }
-    return result;
-}
-
 void MyOpenGLWidget::UpdateOnChange(int width, int height) {
     const Mat4x4 rotateMatrix = GenerateRotateMatrix(RotateType::OX) *
                                 GenerateRotateMatrix(RotateType::OY) *
@@ -292,13 +153,7 @@ void MyOpenGLWidget::UpdateOnChange(int width, int height) {
     const Mat4x4 scaleMatrix = GenerateScaleMatrix(width, height);
     const Mat4x4 transformMatrix = scaleMatrix * projectionMatrix;
 
-    EllipsoidLayer.SetVertexCount(VertexCount);
-    EllipsoidLayer.SetSurfaceCount(SurfaceCount);
-    Layers = EllipsoidLayer.GenerateVertices(rotateMatrix);
-    SetUniformMatrix(transformMatrix);
-    SetUniformValue(AMBIENT_COEFF, AmbientCoeff);
-    SetUniformValue(DIFFUSE_COEFF, DiffuseCoeff);
-    SetUniformValue(SPECULAR_COEFF, SpecularCoeff);
+    SetUniformMatrix(transformMatrix);;
 }
 
 void MyOpenGLWidget::OnWidgetUpdate() {
