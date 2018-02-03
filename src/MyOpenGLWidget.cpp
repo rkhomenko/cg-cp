@@ -21,7 +21,7 @@ const float MyOpenGLWidget::PI = 4.0f * std::atan(1.0f);
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget* parent)
     : QOpenGLWidget(parent),
-      ScaleFactor{3.0f},
+      ScaleFactor{1.0f},
       AngleOX{0.0},
       AngleOY{0.0},
       AngleOZ{0.0},
@@ -103,9 +103,25 @@ void MyOpenGLWidget::initializeGL() {
     Buffer->bind();
     Buffer->setUsagePattern(QOpenGLBuffer::DynamicDraw);
 
+    Vertex triangle[] = {Vertex{-175.f, -175.0f},
+                         Vertex{0.0f, 350.0f * std::sqrt(3) / 2 - 175.0f},
+                         Vertex{175.0f, -175.0f}};
+
+    Buffer->allocate(triangle, 3 * sizeof(Vertex));
+
     VertexArray = new QOpenGLVertexArrayObject;
     VertexArray->create();
     VertexArray->bind();
+
+    int posAttr = ShaderProgram->attributeLocation(POSITION);
+    ShaderProgram->enableAttributeArray(posAttr);
+    ShaderProgram->setAttributeBuffer(
+        posAttr, GL_FLOAT, Vertex::GetPositionOffset(),
+        Vertex::GetPositionTupleSize(), Vertex::GetStride());
+
+    ShaderProgram->disableAttributeArray(posAttr);
+
+    UpdateOnChange(width(), height());
 
     VertexArray->release();
     Buffer->release();
@@ -123,14 +139,15 @@ void MyOpenGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    Buffer->destroy();
-    if (!Buffer->create()) {
-        qDebug() << "Cannot create buffer";
-    }
-
     if (!Buffer->bind()) {
         qDebug() << "Cannot bind buffer";
     }
+
+    VertexArray->bind();
+    int posAttr = ShaderProgram->attributeLocation(POSITION);
+    ShaderProgram->enableAttributeArray(posAttr);
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     Buffer->release();
     VertexArray->release();
@@ -151,9 +168,10 @@ void MyOpenGLWidget::UpdateOnChange(int width, int height) {
                                 GenerateRotateMatrix(RotateType::OZ);
     const Mat4x4 projectionMatrix = GenerateProjectionMatrix();
     const Mat4x4 scaleMatrix = GenerateScaleMatrix(width, height);
-    const Mat4x4 transformMatrix = scaleMatrix * projectionMatrix;
+    const Mat4x4 transformMatrix =
+        scaleMatrix * projectionMatrix * rotateMatrix;
 
-    SetUniformMatrix(transformMatrix);;
+    SetUniformMatrix(transformMatrix);
 }
 
 void MyOpenGLWidget::OnWidgetUpdate() {
@@ -165,8 +183,8 @@ Mat4x4 MyOpenGLWidget::GenerateScaleMatrix(int width, int height) const {
     const auto DEFAULT_WIDTH = IMAGE_DEFAULT_SIZE.width();
     const auto DEFAULT_HEIGHT = IMAGE_DEFAULT_SIZE.height();
 
-    auto xScaleFactor = 1.0f * DEFAULT_WIDTH / width;
-    auto yScaleFactor = 1.0f * DEFAULT_HEIGHT / height;
+    auto xScaleFactor = 1.0f / (0.5f * width);
+    auto yScaleFactor = 1.0f / (0.5f * height);
 
     GLfloat matrixData[] = {
         xScaleFactor * ScaleFactor,
