@@ -75,6 +75,7 @@ QWidget* MyMainWindow::CreateViewTabWidget() {
     label->setSizePolicy(fixedSizePolicy);
     toolLayout->addWidget(controlWidget);
     toolLayout->addWidget(label);
+    toolLayout->addStretch();
 
     // set connection for redraw on scale changed
     connect(controlWidget, &MyControlWidget::ScaleUpSignal, OpenGLWidget,
@@ -105,7 +106,8 @@ QWidget* MyMainWindow::CreatePointsTabWidget() {
     const auto sizePolicy = QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     auto widget = new QWidget;
-    auto mainLayout = new QVBoxLayout;
+    auto mainLayout = new QHBoxLayout;
+    auto pointToolLayout = new QVBoxLayout;
 
     auto openButton = new QPushButton;
     auto saveButton = new QPushButton;
@@ -181,9 +183,18 @@ QWidget* MyMainWindow::CreatePointsTabWidget() {
     fileLayout->addWidget(saveButton);
     fileLayout->addStretch();
 
-    mainLayout->addLayout(fileLayout);
-    mainLayout->addWidget(FirstCurvePoints);
-    mainLayout->addWidget(SecondCurvePoints);
+    pointToolLayout->addLayout(fileLayout);
+    pointToolLayout->addWidget(FirstCurvePoints);
+    pointToolLayout->addWidget(SecondCurvePoints);
+    pointToolLayout->addStretch();
+
+    auto labelLayout = new QVBoxLayout;
+    auto label = new QLabel(VARIANT_DESCRIPTION);
+    labelLayout->addWidget(label);
+
+    mainLayout->addLayout(pointToolLayout);
+    mainLayout->addStretch();
+    mainLayout->addLayout(labelLayout);
     mainLayout->addStretch();
 
     widget->setLayout(mainLayout);
