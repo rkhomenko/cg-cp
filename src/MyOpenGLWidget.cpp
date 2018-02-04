@@ -119,7 +119,7 @@ void MyOpenGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    std::vector<Vertex> curvesVertices;
+    /*std::vector<Vertex> curvesVertices;
     BezierCurve firstCurve(FirstCurve);
     float deltaT = 0.05;
 
@@ -136,6 +136,30 @@ void MyOpenGLWidget::paintGL() {
     }
 
     curvesVertices.push_back(secondCurve(1.0f));
+    */
+
+    BezierCurve firstCurve(FirstCurve);
+    BezierCurve secondCurve(SecondCurve);
+    auto surfacePoint = [&](auto u, auto w) -> Vec4 {
+        return (1 - w) * firstCurve(u) + w * secondCurve(u);
+    };
+
+    std::vector<Vertex> surfaceVertices;
+    float deltaU = 0.05f;
+    float deltaW = 0.1f;
+    for (auto w = 0.0f; w < 1.0f; w += deltaW) {
+        for (auto u = 0.0f; u < 1.0f; u += deltaU) {
+            surfaceVertices.push_back(surfacePoint(u, w));
+        }
+        surfaceVertices.push_back(surfacePoint(1.0f, w));
+    }
+
+    auto lineVerticesCount = surfaceVertices.size();
+    for (auto u = 0.0f; u < 1.0f; u += deltaU) {
+        surfaceVertices.push_back(surfacePoint(u, 1.0f));
+    }
+    surfaceVertices.push_back(surfacePoint(1.0f, 1.0f));
+    lineVerticesCount = surfaceVertices.size() - lineVerticesCount;
 
     Buffer->destroy();
     if (!Buffer->create()) {
@@ -145,8 +169,8 @@ void MyOpenGLWidget::paintGL() {
         qDebug() << "Cannot bind buffer!";
     }
     Buffer->setUsagePattern(QOpenGLBuffer::DynamicDraw);
-    Buffer->allocate(curvesVertices.data(),
-                     sizeof(Vertex) * curvesVertices.size());
+    Buffer->allocate(surfaceVertices.data(),
+                     sizeof(Vertex) * surfaceVertices.size());
 
     VertexArray->destroy();
     VertexArray->create();
@@ -163,9 +187,14 @@ void MyOpenGLWidget::paintGL() {
         colorAttr, GL_FLOAT, Vertex::GetColorOffset(),
         Vertex::GetColorTupleSize(), Vertex::GetStride());
 
-    glDrawArrays(GL_LINE_STRIP, 0, firstCurveSize);
-    glDrawArrays(GL_LINE_STRIP, firstCurveSize,
-                 curvesVertices.size() - firstCurveSize);
+    auto linesCount =
+        surfaceVertices.size() / lineVerticesCount +
+        ((surfaceVertices.size() % lineVerticesCount != 0) ? 1 : 0);
+    auto offset = 0;
+    for (auto i = 0UL; i < linesCount; i++) {
+        glDrawArrays(GL_LINE_STRIP, offset, lineVerticesCount);
+        offset += lineVerticesCount;
+    }
 
     Buffer->release();
     VertexArray->release();
