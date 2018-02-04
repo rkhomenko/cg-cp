@@ -23,6 +23,7 @@ class MyOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 
 public:
     using FloatType = float;
+    using Pair = std::pair<std::vector<Vertex>, int>;
 
     explicit MyOpenGLWidget(QWidget* parent = nullptr);
     ~MyOpenGLWidget();
@@ -70,6 +71,10 @@ private:
 
     void SetUniformMatrix(const Mat4x4& transformMatrix);
     void SetUniformValue(const char* name, float value);
+
+    Vec4 SurfacePoint(float u, float w) const noexcept;
+    Pair GenBuff1Points() const noexcept;
+    Pair GenBuff2Points() const noexcept;
 
     static Mat4x4 GenerateRotateMatrixByAngle(RotateType rotateType,
                                               FloatType angle);

@@ -19,6 +19,8 @@
 
 const float MyOpenGLWidget::PI = 4.0f * std::atan(1.0f);
 
+using Pair = MyOpenGLWidget::Pair;
+
 MyOpenGLWidget::MyOpenGLWidget(QWidget* parent)
     : QOpenGLWidget(parent),
       ScaleFactor{1.0f},
@@ -111,6 +113,54 @@ void MyOpenGLWidget::resizeGL(int width, int height) {
     UpdateOnChange(width, height);
 }
 
+Vec4 MyOpenGLWidget::SurfacePoint(float u, float w) const noexcept {
+    BezierCurve firstCurve(FirstCurve);
+    BezierCurve secondCurve(SecondCurve);
+    return (1 - w) * firstCurve(u) + w * secondCurve(u);
+}
+
+Pair MyOpenGLWidget::GenBuff1Points() const noexcept {
+    std::vector<Vertex> surfaceVertices;
+    float deltaU = 0.05f;
+    float deltaW = 0.1f;
+    for (auto w = 0.0f; w < 1.0f; w += deltaW) {
+        for (auto u = 0.0f; u < 1.0f; u += deltaU) {
+            surfaceVertices.push_back(SurfacePoint(u, w));
+        }
+        surfaceVertices.push_back(SurfacePoint(1.0f, w));
+    }
+
+    auto lineVerticesCount = surfaceVertices.size();
+    for (auto u = 0.0f; u < 1.0f; u += deltaU) {
+        surfaceVertices.push_back(SurfacePoint(u, 1.0f));
+    }
+    surfaceVertices.push_back(SurfacePoint(1.0f, 1.0f));
+    lineVerticesCount = surfaceVertices.size() - lineVerticesCount;
+
+    return std::make_pair(surfaceVertices, lineVerticesCount);
+}
+
+Pair MyOpenGLWidget::GenBuff2Points() const noexcept {
+    std::vector<Vertex> surfaceVertices;
+    float deltaU = 0.05f;
+    float deltaW = 0.1f;
+    for (auto u = 0.0f; u < 1.0f; u += deltaU) {
+        for (auto w = 0.0f; w < 1.0f; w += deltaW) {
+            surfaceVertices.push_back(SurfacePoint(u, w));
+        }
+        surfaceVertices.push_back(SurfacePoint(u, 1.0f));
+    }
+
+    auto lineVerticesCount = surfaceVertices.size();
+    for (auto w = 0.0f; w < 1.0f; w += deltaW) {
+        surfaceVertices.push_back(SurfacePoint(1.0f, w));
+    }
+    surfaceVertices.push_back(SurfacePoint(1.0f, 1.0f));
+    lineVerticesCount = surfaceVertices.size() - lineVerticesCount;
+
+    return std::make_pair(surfaceVertices, lineVerticesCount);
+}
+
 void MyOpenGLWidget::paintGL() {
     if (!ShaderProgram->bind()) {
         qDebug() << "Cannot bind program";
@@ -119,47 +169,13 @@ void MyOpenGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    /*std::vector<Vertex> curvesVertices;
-    BezierCurve firstCurve(FirstCurve);
-    float deltaT = 0.05;
-
-    for (float t = 0.0f; t < 1.0f; t += deltaT) {
-        curvesVertices.push_back(firstCurve(t));
-    }
-
-    curvesVertices.push_back(firstCurve(1.0f));
-    auto firstCurveSize = curvesVertices.size();
-
-    BezierCurve secondCurve(SecondCurve);
-    for (float t = 0.0f; t < 1.0f; t += deltaT) {
-        curvesVertices.push_back(secondCurve(t));
-    }
-
-    curvesVertices.push_back(secondCurve(1.0f));
-    */
-
-    BezierCurve firstCurve(FirstCurve);
-    BezierCurve secondCurve(SecondCurve);
-    auto surfacePoint = [&](auto u, auto w) -> Vec4 {
-        return (1 - w) * firstCurve(u) + w * secondCurve(u);
-    };
+    auto v1 = GenBuff1Points();
+    auto v2 = GenBuff2Points();
 
     std::vector<Vertex> surfaceVertices;
-    float deltaU = 0.05f;
-    float deltaW = 0.1f;
-    for (auto w = 0.0f; w < 1.0f; w += deltaW) {
-        for (auto u = 0.0f; u < 1.0f; u += deltaU) {
-            surfaceVertices.push_back(surfacePoint(u, w));
-        }
-        surfaceVertices.push_back(surfacePoint(1.0f, w));
-    }
-
-    auto lineVerticesCount = surfaceVertices.size();
-    for (auto u = 0.0f; u < 1.0f; u += deltaU) {
-        surfaceVertices.push_back(surfacePoint(u, 1.0f));
-    }
-    surfaceVertices.push_back(surfacePoint(1.0f, 1.0f));
-    lineVerticesCount = surfaceVertices.size() - lineVerticesCount;
+    surfaceVertices.reserve(v1.first.size() + v2.first.size());
+    surfaceVertices.insert(surfaceVertices.begin(), v1.first.begin(), v1.first.end());
+    surfaceVertices.insert(surfaceVertices.end(), v2.first.begin(), v2.first.end());
 
     Buffer->destroy();
     if (!Buffer->create()) {
@@ -170,7 +186,7 @@ void MyOpenGLWidget::paintGL() {
     }
     Buffer->setUsagePattern(QOpenGLBuffer::DynamicDraw);
     Buffer->allocate(surfaceVertices.data(),
-                     sizeof(Vertex) * surfaceVertices.size());
+                      sizeof(Vertex) * surfaceVertices.size());
 
     VertexArray->destroy();
     VertexArray->create();
@@ -187,13 +203,20 @@ void MyOpenGLWidget::paintGL() {
         colorAttr, GL_FLOAT, Vertex::GetColorOffset(),
         Vertex::GetColorTupleSize(), Vertex::GetStride());
 
-    auto linesCount =
-        surfaceVertices.size() / lineVerticesCount +
-        ((surfaceVertices.size() % lineVerticesCount != 0) ? 1 : 0);
+    auto count1 =
+        v1.first.size() / v1.second +
+        ((v1.first.size() % v1.second != 0) ? 1 : 0);
+    auto count2 =
+        v2.first.size() / v2.second +
+        ((v2.first.size() % v2.second != 0) ? 1 : 0);
     auto offset = 0;
-    for (auto i = 0UL; i < linesCount; i++) {
-        glDrawArrays(GL_LINE_STRIP, offset, lineVerticesCount);
-        offset += lineVerticesCount;
+    for (auto i = 0UL; i < count1; i++) {
+        glDrawArrays(GL_LINE_STRIP, offset, v1.second);
+        offset += v1.second;
+    }
+    for (auto i = 0UL; i < count2; i++) {
+        glDrawArrays(GL_LINE_STRIP, offset, v2.second);
+        offset += v2.second;
     }
 
     Buffer->release();
