@@ -399,7 +399,7 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="spacerToolVertexLayout">
+        <layout class="QHBoxLayout" name="spacerToolPointsLayout">
          <property name="spacing">
           <number>0</number>
          </property>
@@ -407,7 +407,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="vertexLabel">
+          <widget class="QLabel" name="pointLabel">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -420,12 +420,12 @@
             </font>
            </property>
            <property name="text">
-            <string>Lines: </string>
+            <string>Points: </string>
            </property>
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="spacerVertexLayout">
+          <layout class="QHBoxLayout" name="spacerPointsLayout">
            <property name="spacing">
             <number>3</number>
            </property>
@@ -436,7 +436,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="vetexStartLabel">
+            <widget class="QLabel" name="pointsMinLabel">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -449,7 +449,112 @@
               </font>
              </property>
              <property name="text">
-              <string>4</string>
+              <string>2</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSlider" name="pointsSlider">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>250</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="minimum">
+              <number>2</number>
+             </property>
+             <property name="maximum">
+              <number>20</number>
+             </property>
+             <property name="value">
+              <number>20</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="pointsMaxLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>20</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="spacerToolLinesLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lineLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>  Lines: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="spacerLinesLayout">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="sizeConstraint">
+            <enum>QLayout::SetDefaultConstraint</enum>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lineMinLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>2</string>
              </property>
             </widget>
            </item>
@@ -468,10 +573,10 @@
               </size>
              </property>
              <property name="minimum">
-              <number>4</number>
+              <number>2</number>
              </property>
              <property name="maximum">
-              <number>100</number>
+              <number>20</number>
              </property>
              <property name="value">
               <number>20</number>
@@ -482,7 +587,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="vertexEndLabel">
+            <widget class="QLabel" name="lineMaxLabel">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -495,7 +600,7 @@
               </font>
              </property>
              <property name="text">
-              <string>100</string>
+              <string>20</string>
              </property>
             </widget>
            </item>

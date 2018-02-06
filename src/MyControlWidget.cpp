@@ -57,8 +57,10 @@ MyControlWidget::MyControlWidget(QWidget* parent)
     };
 
     // surface drawing params connection
+    connectSlider(WidgetUi->pointsSlider,
+                  &MyControlWidget::PointsCountChangedSignal);
     connectSlider(WidgetUi->linesSlider,
-                  &MyControlWidget::LineCountChangedSignal);
+                  &MyControlWidget::LinesCountChangedSignal);
 }
 
 MyControlWidget::~MyControlWidget() {

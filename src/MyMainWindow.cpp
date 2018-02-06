@@ -92,8 +92,10 @@ QWidget* MyMainWindow::CreateViewTabWidget() {
             &MyOpenGLWidget::OZAngleChangedSlot);
 
     // set connection for redraw on vertex or surface count changed
-    connect(controlWidget, &MyControlWidget::LineCountChangedSignal,
-            OpenGLWidget, &MyOpenGLWidget::LineCountChangedSlot);
+    connect(controlWidget, &MyControlWidget::PointsCountChangedSignal,
+            OpenGLWidget, &MyOpenGLWidget::PointsCountChangedSlot);
+    connect(controlWidget, &MyControlWidget::LinesCountChangedSignal,
+            OpenGLWidget, &MyOpenGLWidget::LinesCountChangedSlot);
 
     mainLayout->addLayout(toolLayout);
     mainLayout->addWidget(OpenGLWidget);

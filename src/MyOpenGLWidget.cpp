@@ -27,7 +27,8 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget* parent)
       AngleOX{0.0},
       AngleOY{0.0},
       AngleOZ{0.0},
-      LinesCount{0},
+      PointsCount{20},
+      LinesCount{20},
       Teta{0},
       Phi{0} {
     auto sizePolicy =
@@ -68,8 +69,14 @@ void MyOpenGLWidget::OZAngleChangedSlot(FloatType angle) {
     OnWidgetUpdate();
 }
 
-void MyOpenGLWidget::LineCountChangedSlot(int count) {
-    LinesCount = static_cast<SizeType>(count);
+void MyOpenGLWidget::PointsCountChangedSlot(int pointsCount) {
+    PointsCount = static_cast<SizeType>(pointsCount);
+    UpdateOnChange(width(), height());
+    OnWidgetUpdate();
+}
+
+void MyOpenGLWidget::LinesCountChangedSlot(int linesCount) {
+    LinesCount = static_cast<SizeType>(linesCount);
     UpdateOnChange(width(), height());
     OnWidgetUpdate();
 }
@@ -119,43 +126,77 @@ Vec4 MyOpenGLWidget::SurfacePoint(float u, float w) const noexcept {
     return (1 - w) * firstCurve(u) + w * secondCurve(u);
 }
 
-Pair MyOpenGLWidget::GenBuff1Points() const noexcept {
+Pair MyOpenGLWidget::GenBuff1Points(int linesCount, int pointsCount) const
+    noexcept {
     std::vector<Vertex> surfaceVertices;
-    float deltaU = 0.05f;
-    float deltaW = 0.1f;
-    for (auto w = 0.0f; w < 1.0f; w += deltaW) {
+    auto lineVerticesCount = 0ULL;
+    float deltaU = 1.0f / pointsCount;
+    float deltaW = 1.0f / linesCount;
+
+    auto drawPoints = [&, this](float w) {
+        if (pointsCount == 2) {
+            surfaceVertices.push_back(SurfacePoint(0.0f, w));
+            surfaceVertices.push_back(SurfacePoint(1.0f, w));
+            return surfaceVertices.size();
+        }
+
         for (auto u = 0.0f; u < 1.0f; u += deltaU) {
             surfaceVertices.push_back(SurfacePoint(u, w));
         }
         surfaceVertices.push_back(SurfacePoint(1.0f, w));
+        return surfaceVertices.size();
+    };
+
+    if (linesCount == 2) {
+        lineVerticesCount = drawPoints(0.0f);
+        drawPoints(1.0f);
+        return std::make_pair(surfaceVertices, lineVerticesCount);
     }
 
-    auto lineVerticesCount = surfaceVertices.size();
-    for (auto u = 0.0f; u < 1.0f; u += deltaU) {
-        surfaceVertices.push_back(SurfacePoint(u, 1.0f));
+    for (auto w = 0.0f; w < 1.0f; w += deltaW) {
+        drawPoints(w);
     }
-    surfaceVertices.push_back(SurfacePoint(1.0f, 1.0f));
+
+    lineVerticesCount = surfaceVertices.size();
+    drawPoints(1.0f);
     lineVerticesCount = surfaceVertices.size() - lineVerticesCount;
 
     return std::make_pair(surfaceVertices, lineVerticesCount);
 }
 
-Pair MyOpenGLWidget::GenBuff2Points() const noexcept {
+Pair MyOpenGLWidget::GenBuff2Points(int linesCount, int pointsCount) const
+    noexcept {
     std::vector<Vertex> surfaceVertices;
-    float deltaU = 0.05f;
-    float deltaW = 0.1f;
-    for (auto u = 0.0f; u < 1.0f; u += deltaU) {
+    auto lineVerticesCount = 0ULL;
+    float deltaU = 1.0f / pointsCount;
+    float deltaW = 1.0f / linesCount;
+
+    auto drawPoints = [&, this](float u) {
+        if (linesCount == 2) {
+            surfaceVertices.push_back(SurfacePoint(u, 0.0f));
+            surfaceVertices.push_back(SurfacePoint(u, 1.0f));
+            return surfaceVertices.size();
+        }
+
         for (auto w = 0.0f; w < 1.0f; w += deltaW) {
             surfaceVertices.push_back(SurfacePoint(u, w));
         }
         surfaceVertices.push_back(SurfacePoint(u, 1.0f));
+        return surfaceVertices.size();
+    };
+
+    if (linesCount == 2) {
+        lineVerticesCount = drawPoints(0.0f);
+        drawPoints(1.0f);
+        return std::make_pair(surfaceVertices, lineVerticesCount);
     }
 
-    auto lineVerticesCount = surfaceVertices.size();
-    for (auto w = 0.0f; w < 1.0f; w += deltaW) {
-        surfaceVertices.push_back(SurfacePoint(1.0f, w));
+    for (auto u = 0.0f; u < 1.0f; u += deltaU) {
+        drawPoints(u);
     }
-    surfaceVertices.push_back(SurfacePoint(1.0f, 1.0f));
+
+    lineVerticesCount = surfaceVertices.size();
+    drawPoints(1.0f);
     lineVerticesCount = surfaceVertices.size() - lineVerticesCount;
 
     return std::make_pair(surfaceVertices, lineVerticesCount);
@@ -169,13 +210,15 @@ void MyOpenGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    auto v1 = GenBuff1Points();
-    auto v2 = GenBuff2Points();
+    auto v1 = GenBuff1Points(LinesCount, PointsCount);
+    auto v2 = GenBuff2Points(LinesCount, PointsCount);
 
     std::vector<Vertex> surfaceVertices;
     surfaceVertices.reserve(v1.first.size() + v2.first.size());
-    surfaceVertices.insert(surfaceVertices.begin(), v1.first.begin(), v1.first.end());
-    surfaceVertices.insert(surfaceVertices.end(), v2.first.begin(), v2.first.end());
+    surfaceVertices.insert(surfaceVertices.begin(), v1.first.begin(),
+                           v1.first.end());
+    surfaceVertices.insert(surfaceVertices.end(), v2.first.begin(),
+                           v2.first.end());
 
     Buffer->destroy();
     if (!Buffer->create()) {
@@ -186,7 +229,7 @@ void MyOpenGLWidget::paintGL() {
     }
     Buffer->setUsagePattern(QOpenGLBuffer::DynamicDraw);
     Buffer->allocate(surfaceVertices.data(),
-                      sizeof(Vertex) * surfaceVertices.size());
+                     sizeof(Vertex) * surfaceVertices.size());
 
     VertexArray->destroy();
     VertexArray->create();
@@ -203,9 +246,8 @@ void MyOpenGLWidget::paintGL() {
         colorAttr, GL_FLOAT, Vertex::GetColorOffset(),
         Vertex::GetColorTupleSize(), Vertex::GetStride());
 
-    auto count1 =
-        v1.first.size() / v1.second +
-        ((v1.first.size() % v1.second != 0) ? 1 : 0);
+    auto count1 = v1.first.size() / v1.second +
+                  ((v1.first.size() % v1.second != 0) ? 1 : 0);
     auto count2 =
         v2.first.size() / v2.second +
         ((v2.first.size() % v2.second != 0) ? 1 : 0);

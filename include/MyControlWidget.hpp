@@ -27,7 +27,8 @@ signals:
     void OYAngleChangedSignal(float angle);
     void OZAngleChangedSignal(float angle);
 
-    void LineCountChangedSignal(int lineCount);
+    void PointsCountChangedSignal(int pointsCount);
+    void LinesCountChangedSignal(int linesCount);
 
 private:
     static const float PI;

@@ -38,7 +38,8 @@ public slots:
     void OYAngleChangedSlot(FloatType angle);
     void OZAngleChangedSlot(FloatType angle);
 
-    void LineCountChangedSlot(int count);
+    void PointsCountChangedSlot(int pointsCount);
+    void LinesCountChangedSlot(int linesCount);
 
 protected:
     void initializeGL() override;
@@ -73,8 +74,8 @@ private:
     void SetUniformValue(const char* name, float value);
 
     Vec4 SurfacePoint(float u, float w) const noexcept;
-    Pair GenBuff1Points() const noexcept;
-    Pair GenBuff2Points() const noexcept;
+    Pair GenBuff1Points(int linesCount, int pointsCount) const noexcept;
+    Pair GenBuff2Points(int linesCount, int pointsCount) const noexcept;
 
     static Mat4x4 GenerateRotateMatrixByAngle(RotateType rotateType,
                                               FloatType angle);
@@ -87,6 +88,7 @@ private:
     FloatType AngleOX;
     FloatType AngleOY;
     FloatType AngleOZ;
+    SizeType PointsCount;
     SizeType LinesCount;
     FloatType Teta;
     FloatType Phi;
